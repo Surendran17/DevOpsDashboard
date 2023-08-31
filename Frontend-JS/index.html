@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<head>
+  <!-- Load Plotly.js library from CDN -->
+  <script src="https://cdn.plot.ly/plotly-2.25.2.min.js" charset="utf-8"></script>
+  <!-- Styling for the HTML page -->
+  <style>
+
+    /* CSS class to hide loading spinner */
+    .display-none {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading spinner displayed while fetching data -->
+  <div id="loading"></div>
+  <!-- Container for individual charts -->
+  <div class="main-container">
+    <!-- Container for AWS data chart -->
+    <div id="chart-container-1" class="chart-container"></div>
+    <!-- Container for GCP data chart -->
+    <div id="chart-container-2" class="chart-container"></div>
+  </div>
+  <!-- Container for combined chart -->
+  <div id="chart-container-3" class="combine-chart"></div>
+</body>
+<!-- JavaScript code to fetch and display data using Plotly -->
+<script>
+  window.onload = () => {
+    // Display a message to indicate that the page is ready
+    console.log("I am ready");
+
+    // Fetch data from the provided URL
+    fetch("http://54.87.63.203:5000/metrics")
+      .then((resp) => resp.json())
+      .then((resp) => {
+        // Hide the loading spinner
+        document.getElementById("loading").classList.add("display-none");
+
+        // Separate AWS and GCP data
+        const awsData = resp.data.filter((data) => data.cp?.S === "AWS");
+        const gcpData = resp.data.filter((data) => data.cp?.S === "GCP");
+
+        // Extract x-axis and y-axis data for AWS chart
+        const xAxisData1 = awsData.map((data) => data.timestamp.S);
+        const yAxisData1 = awsData.map((data) => data.value.S);
+
+        // Extract x-axis and y-axis data for GCP chart
+        const xAxisData2 = gcpData.map((data) => data.timestamp.S);
+        const yAxisData2 = gcpData.map((data) => data.value.S);
+
+        // Create traces and data for individual AWS and GCP charts
+        var trace1 = {
+          x: xAxisData1,
+          y: yAxisData1,
+          type: "scatter",
+        };
+        var data1 = [trace1];
+        Plotly.newPlot("chart-container-1", data1);
+
+        var trace2 = {
+          x: xAxisData2,
+          y: yAxisData2,
+          type: "scatter",
+        };
+        var data2 = [trace2];
+        Plotly.newPlot("chart-container-2", data2);
+
+        // Filter and update data for the combined chart
+        const updatedAwsvalue = awsData.filter((data) => {
+        });
+
+        const updatedGcpvalue = gcpData.filter((data) => {
+        });
+
+        // Extract x-axis and y-axis data for the combined chart
+        const xAxisData3 = updatedAwsvalue.map((data) => data.timestamp.S);
+        const yAxisData3 = updatedAwsvalue.map((data) => data.value.S);
+        const xAxisData4 = updatedGcpvalue.map((data) => data.timestamp.S);
+        const yAxisData4 = updatedGcpvalue.map((data) => data.value.S);
+
+        // Create traces and data for the combined chart
+        var trace3 = {
+          x: xAxisData3,
+          y: yAxisData3,
+          type: "scatter",
+        };
+        var trace4 = {
+          x: xAxisData4,
+          y: yAxisData4,
+          type: "scatter",
+        };
+        var data3 = [trace3, trace4];
+        Plotly.newPlot("chart-container-3", data3);
+      });
+  };
+</script>
+</html>
